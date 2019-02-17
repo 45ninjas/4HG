@@ -13,11 +13,22 @@ namespace NineFive.Proc
 
         Vector2Int[] tiles;
 
+        public static Vector2Int[] directions = new Vector2Int[]
+        {
+            Vector2Int.up,
+            Vector2Int.left,
+            Vector2Int.down,
+            Vector2Int.right
+        };
+
         [SerializeField]
         public string StartingSeed = "Hello World";
 
         [HideInInspector]
         public int Seed;
+
+        [SerializeField]
+        public GameObject wallprefab;
 
         public void CreateStore(string seed)
         {
@@ -37,6 +48,31 @@ namespace NineFive.Proc
             var floorPlan = new FloorPlan(blockSize, blockMoves, random);
 
             tiles = floorPlan.GetTiles();
+
+            HashSet<Vector2Int> hashSet = new HashSet<Vector2Int>(tiles);
+
+            Vector2Int tile;
+            for (int i = 0; i < tiles.Length; i++)
+            {
+                tile = tiles[i];
+                
+                if(!hashSet.Contains(tile + directions[0]))
+                    SpawnWall(tile, directions[0]);
+                if (!hashSet.Contains(tile + directions[1]))
+                    SpawnWall(tile, directions[1]);
+                if (!hashSet.Contains(tile + directions[2]))
+                    SpawnWall(tile, directions[2]);
+                if (!hashSet.Contains(tile + directions[3]))
+                    SpawnWall(tile, directions[3]);
+            }
+        }
+
+        public void SpawnWall(Vector2Int pos, Vector2Int direction)
+        {
+            GameObject wall = Instantiate(wallprefab, transform, true);
+
+            wall.transform.position = new Vector3(pos.x, 0, pos.y);
+            wall.transform.rotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.y), Vector3.up);
         }
 
         private void Start()
@@ -81,14 +117,6 @@ namespace NineFive.Proc
                     new Vector2Int(0, 1),
                     new Vector2Int(1, 1),
                     new Vector2Int(1, 0)
-                };
-
-                Vector2Int[] directions = new Vector2Int[]
-                {
-                    Vector2Int.up,
-                    Vector2Int.left,
-                    Vector2Int.down,
-                    Vector2Int.right
                 };
 
                 List<Vector2Int> blocks = new List<Vector2Int>(square);
