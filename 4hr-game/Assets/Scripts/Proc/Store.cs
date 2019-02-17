@@ -6,7 +6,7 @@ namespace NineFive.Proc
 {
     public class Store : MonoBehaviour
     {
-        public const int blockSize = 4;
+        public const int blockSize = 6;
         public const int blockMoves = 4;
 
         System.Random random;
