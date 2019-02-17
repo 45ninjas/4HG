@@ -6,15 +6,19 @@ using UnityEngine.UI;
 public class uiElements : MonoBehaviour
 {
 
-    public string seedID;
-    public Text seed;
-    
+    GameObject gs; //getseed
+    GameObject storescript; 
+
+
 
     // Start is called before the first frame update
     void Start()
     {
 
-        
+        gs = GameObject.Find("default");
+        storescript = gs.GetComponent < default > ();
+
+
 
     }
 
@@ -22,7 +26,8 @@ public class uiElements : MonoBehaviour
     void Update()
     {
 
-        seed.text = "Seed: " + seedID;
+        Debug.Log(gs.seed);
+        
 
     }
 }
