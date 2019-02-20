@@ -37,3 +37,10 @@
 # Builds
 4hr-game/*.apk
 4hr-game/*.unitypackage
+
+# Blender Backup files
+*.blend1
+*.blend2
+*.blend3
+*.blend4
+*.blend5
