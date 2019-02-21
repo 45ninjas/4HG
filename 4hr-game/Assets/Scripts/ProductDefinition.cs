@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Product", menuName = "Create Product")]
+[CreateAssetMenu(fileName = "New Product", menuName = "Product Definition")]
 public class ProductDefinition : ScriptableObject
 {
     // The title of the product.
