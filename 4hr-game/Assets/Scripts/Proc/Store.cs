@@ -85,8 +85,6 @@ namespace NineFive.Proc
                     northMost = tiles[i].y;
             }
 
-            Debug.Log(northMost);
-
             // Now that we know what's the highest value. Only add the ones to the list.
 
                 Vector2Int tile;
