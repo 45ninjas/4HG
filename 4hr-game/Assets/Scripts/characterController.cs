@@ -5,32 +5,70 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class characterController : MonoBehaviour
 {
+    public float Speed = 1.0f;
+    public float Sensitvity = 2.5f;
 
+    public float VerticalLookLimit = 86;
 
-    public float speed = 1.0F;
-    public float rotateSpeed = 1.0F;
+    CharacterController controller;
 
-    private void Update()
+    [SerializeField]
+    private Transform camera;
+
+    private Vector2 lookRotaion;
+
+    [HideInInspector]
+    public Vector3 LookNormal;
+
+    private void Start()
     {
+        controller = GetComponent<CharacterController>();
+    }
 
+    private void LateUpdate()
+    {
+        // Get the direction the player want's to move.
+        Vector3 direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
+        // Move the player
+        MovePlayer(direction);
 
-        CharacterController controller = GetComponent<CharacterController>();
+        // Rotate the camera
+        RotateCamera(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+    }
 
-        float mouseInput = Input.GetAxis("Mouse X");
-        Vector3 lookhere = new Vector3(0, mouseInput, 0);
-        transform.Rotate(lookhere);
+    void RotateCamera(float horizontal, float vertical)
+    {
+        lookRotaion.x += horizontal * Sensitvity;
+        lookRotaion.y -= vertical * Sensitvity;
 
-        Vector3 forward = transform.forward;
-        float curSpeed = speed * Input.GetAxis("Vertical");
-        controller.SimpleMove(forward * curSpeed);
+        lookRotaion.y = Mathf.Clamp(lookRotaion.y, -VerticalLookLimit, VerticalLookLimit);
 
-        Vector3 sideways = new Vector3(0, 5, 0);
-        float xurSpeed = speed * Input.GetAxis("Horizontal");
-        controller.SimpleMove(sideways * xurSpeed);
+        transform.localRotation = Quaternion.Euler(0, lookRotaion.x, 0);
+        camera.localRotation = Quaternion.Euler(lookRotaion.y, 0, 0);
 
+        LookNormal = camera.forward;
+    }
 
+    void MovePlayer(Vector3 direction)
+    {
+        // Convert the direction from local space to world space.
+        direction = transform.TransformDirection(direction);
 
+        // Keep the magnitude below 1.
+        if (direction.magnitude > 1)
+            direction.Normalize();
 
+        // Now that we have a direction the player moves in, let's move the controller.
+
+        // Set the standard move speed.
+        float moveSpeed = Speed;
+
+        // If the player is running, set the move speed to whatever.
+        // If the player is crouching, set the move speed here.
+
+        // Lastly, move the controller in the direction at the move speed being frame rate agnostic.
+        Vector3 moveVector = direction * moveSpeed /** Time.deltaTime*/;
+        controller.SimpleMove(moveVector);
     }
 }
