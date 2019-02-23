@@ -10,12 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6f1453e3ac865804095b49906412053a, type: 3}
-  m_Name: Concrete Shovel
+  m_Name: Camera
   m_EditorClassIdentifier: 
-  Title: Shovel
+  Title: Camera
   Alias:
-  - Spade
-  - Big Scooper
-  Price: 19.95
-  Prefab: {fileID: 865850006952934834, guid: c8d1f8d00eebb344086ca39319306e45, type: 3}
+  - DSLR
+  Price: 875
+  Prefab: {fileID: 1640676178811300253, guid: 36e9a9c54bed1b341875920306b54c92, type: 3}
   Icon: {fileID: 0}
