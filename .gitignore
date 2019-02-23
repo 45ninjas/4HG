@@ -44,3 +44,9 @@
 *.blend3
 *.blend4
 *.blend5
+
+*.blend1.meta
+*.blend2.meta
+*.blend3.meta
+*.blend4.meta
+*.blend5.meta
