@@ -9,9 +9,12 @@ namespace NineFive.Proc
         public const int blockSize = 6;
         public const int blockMoves = 4;
 
+        public GameObject[] prefabs;
+
         System.Random random;
 
         Vector2Int[] tiles;
+        HashSet<Vector2Int> tileSet;
 
         public static Vector2Int[] directions = new Vector2Int[]
         {
@@ -27,9 +30,6 @@ namespace NineFive.Proc
         [HideInInspector]
         public int Seed;
 
-        [SerializeField]
-        public GameObject wallprefab;
-
         public void CreateStore(string seed)
         {
             CreateStore(seed.GetHashCode());
@@ -40,39 +40,89 @@ namespace NineFive.Proc
             CreateStore(seed);
         }
 
-        public void CreateStore(int seed)
+        public void ClearStore()
         {
-            random = new System.Random(seed);
-            Seed = seed;
-
-            var floorPlan = new FloorPlan(blockSize, blockMoves, random);
-
-            tiles = floorPlan.GetTiles();
-
-            HashSet<Vector2Int> hashSet = new HashSet<Vector2Int>(tiles);
-
-            Vector2Int tile;
-            for (int i = 0; i < tiles.Length; i++)
+            // Destroy each child of the store.
+            foreach (Transform child in transform)
             {
-                tile = tiles[i];
-                
-                if(!hashSet.Contains(tile + directions[0]))
-                    SpawnWall(tile, directions[0]);
-                if (!hashSet.Contains(tile + directions[1]))
-                    SpawnWall(tile, directions[1]);
-                if (!hashSet.Contains(tile + directions[2]))
-                    SpawnWall(tile, directions[2]);
-                if (!hashSet.Contains(tile + directions[3]))
-                    SpawnWall(tile, directions[3]);
+                // The editor is special. Make it have it's own food.
+                if (Application.isEditor)
+                    DestroyImmediate(child.gameObject);
+                else
+                    Destroy(child.gameObject);
             }
         }
 
-        public void SpawnWall(Vector2Int pos, Vector2Int direction)
+        public void CreateStore(int seed)
         {
-            GameObject wall = Instantiate(wallprefab, transform, true);
+            // Clear the old store.
+            ClearStore();
 
-            wall.transform.position = new Vector3(pos.x, 0, pos.y);
-            wall.transform.rotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.y), Vector3.up);
+            // Create a new random number generator with the provided seed.
+            random = new System.Random(seed);
+            Seed = seed;
+
+            // Create a floor plan object.
+            var floorPlan = new FloorPlan(blockSize, blockMoves, random);
+
+            // Get all the tiles of this store from the floor plan.
+            tiles = floorPlan.GetTiles();
+            tileSet = new HashSet<Vector2Int>(tiles);
+
+            CreateStoreWalls();
+        }
+
+        public void CreateStoreWalls()
+        {
+            List<Vector3Int> frontWalls = new List<Vector3Int>();
+
+            // Get the highest (y) value.
+            int northMost = int.MinValue;
+
+            for (int i = 0; i < tiles.Length; i++)
+            {
+                if (tiles[i].y > northMost)
+                    northMost = tiles[i].y;
+            }
+
+            Debug.Log(northMost);
+
+            // Now that we know what's the highest value. Only add the ones to the list.
+
+                Vector2Int tile;
+            for (int i = 0; i < tiles.Length; i++)
+            {
+                tile = tiles[i];
+
+                int prefab = 0;
+
+                // If the wall is the north most wall. Make it a window wall.
+                if (tile.y >= northMost)
+                    prefab = 1;
+
+                if (!tileSet.Contains(tile + directions[0]))
+                    SpawnWall(tile, directions[0], prefab);
+                if (!tileSet.Contains(tile + directions[1]))
+                    SpawnWall(tile, directions[1], prefab);
+                if (!tileSet.Contains(tile + directions[2]))
+                    SpawnWall(tile, directions[2], prefab);
+                if (!tileSet.Contains(tile + directions[3]))
+                    SpawnWall(tile, directions[3], prefab);
+            }
+        }
+
+        public void SpawnWall(Vector2Int pos, Vector2Int direction, int prefabIndex)
+        {
+            if(prefabIndex > prefabs.Length)
+                throw new System.IndexOutOfRangeException("Prefab index is too high. Is there enough prefabs.");
+
+            GameObject wall = Instantiate(prefabs[prefabIndex], transform, true);
+
+            // Get the direction the wall needs to face.
+            Vector3 normal = new Vector3(direction.x, 0, direction.y);
+
+            wall.transform.position = new Vector3(pos.x, 0, pos.y) + normal * 0.5f;
+            wall.transform.rotation = Quaternion.LookRotation(-normal, Vector3.up);
         }
 
         private void Start()
@@ -97,7 +147,6 @@ namespace NineFive.Proc
         public class FloorPlan
         {
             private int blockSize = 4;
-
             private int moves = 3;
 
             private System.Random random;
