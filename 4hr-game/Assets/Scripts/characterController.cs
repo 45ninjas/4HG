@@ -5,11 +5,29 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class characterController : MonoBehaviour
 {
-    public float Speed = 1.0f;
+    // Movement speeds.
+    [SerializeField]
+    float Speed = 2.5f;
+    [SerializeField]
+    float RunSpeed = 4.5f;
+    [SerializeField]
+    float CrouchSpeed = 1.2f;
+    // How fast the player accelerates towards the target velocity.
+    [SerializeField]
+    float Acceleration = 2.5f;
+
+    // Mouse sensitivity.
     public float Sensitvity = 2.5f;
 
-    public float VerticalLookLimit = 86;
+    // How high and low to look up and down.
+    [SerializeField]
+    float VerticalLookLimit = 86;
 
+    // How high the player is when crouching.
+    public float CrouchHehight = 1f;
+
+
+    private float standardHeight;
     CharacterController controller;
 
     [SerializeField]
@@ -17,12 +35,29 @@ public class characterController : MonoBehaviour
 
     private Vector2 lookRotaion;
 
+    // This is hidden from the inspector but other scripts need to access it.
     [HideInInspector]
     public Vector3 LookNormal;
+    // This is the direction a player is looking.
+
+    public bool IsCrouched = false;
+    public bool IsGrounded = false;
+    public bool IsRunning = false;
+
+    private float moveSpeed;
 
     private void Start()
     {
         controller = GetComponent<CharacterController>();
+        standardHeight = camera.localPosition.y;
+    }
+
+    private void Update()
+    {
+        IsCrouched = Input.GetButton("Duck");
+        IsRunning = Input.GetButton("Run");
+
+        DoCrouch();
     }
 
     private void LateUpdate()
@@ -30,8 +65,33 @@ public class characterController : MonoBehaviour
         // Get the direction the player want's to move.
         Vector3 direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
+        float accel = Acceleration * Time.deltaTime;
+
+        if (direction == Vector3.zero && moveSpeed > 0)
+            moveSpeed -= accel;
+        else
+            moveSpeed += accel;
+
+        float targetSpeed = Speed;
+        if (IsRunning)
+            targetSpeed = RunSpeed;
+        if (IsCrouched)
+            targetSpeed = CrouchSpeed;
+
+        if (moveSpeed > targetSpeed)
+        {
+            float delta = moveSpeed - targetSpeed;
+
+            Debug.Log(delta);
+
+            if (delta >= accel * 2)
+               moveSpeed -= accel * 2;
+            else
+                moveSpeed -= delta;
+        }
+
         // Move the player
-        MovePlayer(direction);
+        IsGrounded = MovePlayer(direction, moveSpeed);
 
         // Rotate the camera
         RotateCamera(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
@@ -50,7 +110,7 @@ public class characterController : MonoBehaviour
         LookNormal = camera.forward;
     }
 
-    void MovePlayer(Vector3 direction)
+    bool MovePlayer(Vector3 direction, float speed)
     {
         // Convert the direction from local space to world space.
         direction = transform.TransformDirection(direction);
@@ -59,16 +119,22 @@ public class characterController : MonoBehaviour
         if (direction.magnitude > 1)
             direction.Normalize();
 
-        // Now that we have a direction the player moves in, let's move the controller.
-
-        // Set the standard move speed.
-        float moveSpeed = Speed;
-
-        // If the player is running, set the move speed to whatever.
-        // If the player is crouching, set the move speed here.
-
         // Lastly, move the controller in the direction at the move speed being frame rate agnostic.
-        Vector3 moveVector = direction * moveSpeed /** Time.deltaTime*/;
-        controller.SimpleMove(moveVector);
+        Vector3 moveVector = direction * speed /** Time.deltaTime*/;
+        return controller.SimpleMove(moveVector);
+    }
+
+    void DoCrouch()
+    {
+        if(Input.GetButtonDown("Duck"))
+        {
+            // The player is trying to crouch.
+            camera.transform.localPosition = new Vector3(camera.transform.localPosition.x, CrouchHehight, camera.transform.localPosition.z);
+        }
+        if (Input.GetButtonUp("Duck"))
+        {
+            // The player is trying to stand back up.
+            camera.transform.localPosition = new Vector3(camera.transform.localPosition.x, standardHeight, camera.transform.localPosition.z);
+        }
     }
 }
