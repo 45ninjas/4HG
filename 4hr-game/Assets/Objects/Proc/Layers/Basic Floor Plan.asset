@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Basic Floor Plan
   m_EditorClassIdentifier: 
   BlockSize: 8
-  Moves: 4
+  Moves: 10
