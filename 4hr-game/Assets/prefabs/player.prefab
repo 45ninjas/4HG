@@ -227,11 +227,16 @@ MonoBehaviour:
   RunSpeed: 6
   CrouchSpeed: 1.2
   Acceleration: 7
+  JumpVelocity: 15.7
+  JumpRampSpeed: 0.1
+  JumpDecay: 20
   Sensitvity: 2
   VerticalLookLimit: 86
   CrouchHehight: 0.2
   camera: {fileID: 3654647486349429348}
-  LookNormal: {x: 0, y: 0, z: 0}
+  LookNormal: {x: 0.5589382, y: -0.78477585, z: -0.26779646}
   IsCrouched: 0
   IsGrounded: 0
   IsRunning: 0
+  IsJumping: 0
+  Gravity: -8.33
