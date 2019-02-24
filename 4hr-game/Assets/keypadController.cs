@@ -15,6 +15,10 @@ public class keypadController : MonoBehaviour
         Button[] buttons = this.GetComponentsInChildren<Button>();
         Debug.Log("buttons.length = " + buttons.Length);
 
+        
+
+
+
     }
 
     // Update is called once per frame
