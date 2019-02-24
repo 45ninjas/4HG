@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(CharacterController))]
 public class characterController : MonoBehaviour
@@ -14,14 +15,16 @@ public class characterController : MonoBehaviour
     float CrouchSpeed = 1.2f;
     // How fast the player accelerates towards the target velocity.
     [SerializeField]
-    float Acceleration = 2.5f;
-
+    float acceleration = 2.5f;
     [SerializeField]
-    float JumpVelocity = 15;
-    [SerializeField]
-    float JumpRampSpeed = 15;
+    float deAcceleration = 5;
 
-    public float JumpDecay = 20;
+    [SerializeField,FormerlySerializedAs("JumpVelocity")]
+    // How fast the player jumps.
+    float JumpSpeed = 15;
+    [SerializeField]
+    // How quickly the upwards speed of the jump drops down to zero.
+    float JumpDecay = 20;
 
     // Mouse sensitivity.
     [Range(0.5f, 10f)]
@@ -43,60 +46,69 @@ public class characterController : MonoBehaviour
 
     private Vector2 lookRotaion;
 
-    // This is hidden from the inspector but other scripts need to access it.
+    // This is hidden from the inspector but other scripts will need to access it.
+    // This is the direction a player is looking.
     [HideInInspector]
     public Vector3 LookNormal;
-    // This is the direction a player is looking.
 
     public bool IsCrouched = false;
     public bool IsGrounded = false;
     public bool IsRunning = false;
     public bool IsJumping = false;
 
+    // Keep track of the jump velocity.
     private float jumpVelocity = 0;
-    private float jumpTimer = 0;
 
+    // The gravity of the player controller.
     public float Gravity = -13;
 
+    // the speed the player is currently moving at.
     private float moveSpeed;
 
     private void Start()
     {
+        // Get the character controller and the current height.
         controller = GetComponent<CharacterController>();
         standardHeight = camera.localPosition.y;
     }
 
     private void Update()
     {
-        IsCrouched = Input.GetButton("Duck");
+        // Set the running and grounded booleans.
         IsRunning = Input.GetButton("Run");
-
         IsGrounded = controller.isGrounded;
 
+        // Do the crouch code.
         DoCrouch();
 
         // Get the direction the player want's to move.
         Vector3 direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
-        float accel = Acceleration * Time.deltaTime;
+        // This is used a-lot.
+        float accel = acceleration * Time.deltaTime;
 
+        // Slow the player down if there is no input.
         if (direction == Vector3.zero && moveSpeed > 0)
             moveSpeed -= accel;
+        // There is input, so speed the player up.
         else
             moveSpeed += accel;
 
-        float targetSpeed = Speed;
+        // Set the speed limit for the function the player is currently doing.
+        float speedLimit = Speed;
         if (IsRunning)
-            targetSpeed = RunSpeed;
+            speedLimit = RunSpeed;
         if (IsCrouched)
-            targetSpeed = CrouchSpeed;
+            speedLimit = CrouchSpeed;
 
-        if (moveSpeed > targetSpeed)
+        // Enforce the speed limit.
+        if (moveSpeed > speedLimit)
         {
-            float delta = moveSpeed - targetSpeed;
+            // Get the amount the player is over speeding.
+            float delta = moveSpeed - speedLimit;
 
-            if (delta >= accel * 2)
-               moveSpeed -= accel * 2;
+            if (delta >= deAcceleration * Time.deltaTime)
+               moveSpeed -= deAcceleration * Time.deltaTime;
             else
                 moveSpeed -= delta;
         }
@@ -105,7 +117,7 @@ public class characterController : MonoBehaviour
         // Player can only jump if, they are on the ground, not jumping and not crouching..
         if (Input.GetButtonDown("Jump") && IsGrounded && !IsJumping && !IsCrouched)
         {
-            jumpVelocity = JumpVelocity;
+            jumpVelocity = JumpSpeed;
             IsJumping = true;
         }
 
@@ -139,7 +151,6 @@ public class characterController : MonoBehaviour
 
         LookNormal = camera.forward;
     }
-
     void MovePlayer(Vector3 direction, float speed, float verticalVelocity)
     {
         // Convert the direction from local space to world space.
@@ -161,7 +172,12 @@ public class characterController : MonoBehaviour
 
     void DoCrouch()
     {
-        if(Input.GetButtonDown("Duck"))
+        IsCrouched = Input.GetButton("Duck");
+
+        // TODO: Make sure the player can stand back up again.
+        // TODO: Make the player crouch if something heavy is on-top of them?
+
+        if (Input.GetButtonDown("Duck"))
         {
             // The player is trying to crouch.
             camera.transform.localPosition = new Vector3(camera.transform.localPosition.x, CrouchHehight, camera.transform.localPosition.z);
