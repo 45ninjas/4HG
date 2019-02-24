@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 [RequireComponent(typeof(CharacterController))]
-public class characterController : MonoBehaviour
+public class PlayerLocomotion : MonoBehaviour
 {
     // Movement speeds.
     [SerializeField]
