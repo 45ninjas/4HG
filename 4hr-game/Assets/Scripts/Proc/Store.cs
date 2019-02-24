@@ -18,6 +18,9 @@ namespace NineFive.Proc
         [HideInInspector]
         public int Seed;
 
+        [HideInInspector]
+        public RectInt Bounds;
+
         public void CreateStore(string seed)
         {
             CreateStore(seed.GetHashCode());
@@ -74,6 +77,12 @@ namespace NineFive.Proc
                     Gizmos.color = new Color(0, 1f, 0, 0.2f);
                     Gizmos.DrawCube(new Vector3(tile.Key.x, 0, tile.Key.y), new Vector3(1, 0.01f, 1));
                 }
+
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawWireCube(new Vector3(Bounds.center.x, 2.5f, Bounds.center.y), new Vector3(Bounds.size.x + 1, 5, Bounds.size.y + 1));
+
+                Gizmos.DrawLine(new Vector3(Bounds.xMin, 0, Bounds.yMax), new Vector3(Bounds.xMax, 0, Bounds.yMin));
+                Gizmos.DrawLine(new Vector3(Bounds.xMin, 5, Bounds.yMax), new Vector3(Bounds.xMax, 5, Bounds.yMin));
             }
         }
     }

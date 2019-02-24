@@ -12,10 +12,12 @@ namespace NineFive.Proc.Layers
         public int Moves = 3;
 
         private System.Random random;
+        private Store store;
 
         public override void Apply(Store store, System.Random random)
         {
             this.random = random;
+            this.store = store;
 
             var tiles = GetTiles();
 
@@ -75,6 +77,7 @@ namespace NineFive.Proc.Layers
 
         public Vector2Int[] GetTiles()
         {
+            var bounds = new RectInt(0, 0, 0, 0);
             var blocks = GetBlocks();
 
             Vector2Int[] tiles = new Vector2Int[blocks.Length * BlockSize * BlockSize];
@@ -87,11 +90,25 @@ namespace NineFive.Proc.Layers
                 {
                     for (pos.y = 0; pos.y < BlockSize; pos.y++, t++)
                     {
-                        tiles[t] = block * BlockSize + pos;
+                        //tiles[t] = block * BlockSize + pos;
+
+                        Vector2Int tile = block * BlockSize + pos;
+                        tiles[t] = tile;
+
+                        if (tile.x < bounds.xMin)
+                            bounds.xMin = tile.x;
+                        if (tile.x > bounds.xMax)
+                            bounds.xMax = tile.x;
+
+                        if (tile.y < bounds.yMin)
+                            bounds.yMin = tile.y;
+                        if (tile.y > bounds.yMax)
+                            bounds.yMax = tile.y;
                     }
                 }
             }
 
+            store.Bounds = bounds;
             return tiles;
         }
     }
