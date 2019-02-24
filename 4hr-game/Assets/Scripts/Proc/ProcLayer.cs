@@ -4,8 +4,7 @@ using UnityEngine;
 
 namespace NineFive.Proc
 {
-    [System.Serializable]
-    abstract public class ProcLayer
+    abstract public class ProcLayer : ScriptableObject
     {
         public abstract void Apply(Store store, System.Random random);
     }

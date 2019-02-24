@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using NineFive.Proc.Layers;
 
 namespace NineFive.Proc
 {
@@ -24,18 +25,16 @@ namespace NineFive.Proc
             base.OnInspectorGUI();
             if (EditorGUI.EndChangeCheck())
             {
-                PreviewStore(store);
+                if (!Application.isPlaying)
+                    PreviewStore(store);
             }
 
             GUILayout.BeginHorizontal(EditorStyles.toolbar);
 
             if (GUILayout.Button("Preview", EditorStyles.toolbarButton))
             {
-                PreviewStore(store);
-            }
-            if (GUILayout.Button("Generate", EditorStyles.toolbarButton))
-            {
-                store.CreateStore(store.StartingSeed);
+                if(!Application.isPlaying)
+                    PreviewStore(store);
             }
             float height = EditorGUIUtility.currentViewWidth - 21;
 
@@ -46,10 +45,27 @@ namespace NineFive.Proc
 
         void PreviewStore(Store store)
         {
-            const int size = 64;
+            FloorPlan floorPlan = null;
+
+            foreach (var layer in store.layers)
+            {
+                if ((FloorPlan)layer != null)
+                {
+                    floorPlan = (FloorPlan)layer;
+                    break;
+                }
+            }
+
+            if (floorPlan == null)
+                return;
+
+            const int size = 128;
             var preview = new Texture2D(size, size);
             preview.filterMode = FilterMode.Point;
-            var floorPlan = new Store.FloorPlan(Store.blockSize, Store.blockMoves, new System.Random(store.StartingSeed.GetHashCode()));
+
+            store.tiles = new Dictionary<Vector2Int, Transform>();
+
+            floorPlan.Apply(store, new System.Random(store.StartingSeed.GetHashCode()));
             var tiles = floorPlan.GetTiles();
 
             for (int x = 0; x < size; x++)
