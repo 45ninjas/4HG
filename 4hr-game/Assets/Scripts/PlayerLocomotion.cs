@@ -74,6 +74,12 @@ public class PlayerLocomotion : MonoBehaviour
 
     private void Update()
     {
+
+        if(CursorLocker.Locked && Input.GetKey(KeyCode.Escape))
+            CursorLocker.UnlcokCursor();
+        if(!CursorLocker.Locked && (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1)))
+            CursorLocker.LockCursor();
+
         // Set the running and grounded booleans.
         IsRunning = Input.GetButton("Run");
         IsGrounded = controller.isGrounded;

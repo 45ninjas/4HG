@@ -51,5 +51,7 @@
 *.blend4.meta
 *.blend5.meta
 
+*.vscode
+
 
 ffmpeg stuff
