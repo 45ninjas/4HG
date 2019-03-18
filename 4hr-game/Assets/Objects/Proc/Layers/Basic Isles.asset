@@ -9,8 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f96374dc85dae544bed12b88ca7919b, type: 3}
-  m_Name: Basic Floor Plan
+  m_Script: {fileID: 11500000, guid: 14fb577ce75ac1d4bb9850571550de51, type: 3}
+  m_Name: Basic Isles
   m_EditorClassIdentifier: 
-  BlockSize: 8
-  Moves: 4
+  Spacing: 1
+  ShelfPrefab: {fileID: 2863182057724061167, guid: c99d7748321580d469bb1988e1d332d7,
+    type: 3}

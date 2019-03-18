@@ -23,6 +23,22 @@ namespace NineFive.Proc
             // Draw the standard UI.
             EditorGUI.BeginChangeCheck();
             base.OnInspectorGUI();
+
+            bool useSeedBefore = !string.IsNullOrEmpty(store.StartingSeed);
+            bool useSeed = EditorGUILayout.Toggle("Use Seed", useSeedBefore);
+
+            if (useSeed != useSeedBefore)
+            {
+                if (useSeed == false)
+                    store.StartingSeed = null;
+                else if (useSeed)
+                    store.StartingSeed = System.Environment.TickCount.ToString();
+            }
+
+            EditorGUI.BeginDisabledGroup(!useSeed);
+            store.StartingSeed = EditorGUILayout.TextField("Seed", store.StartingSeed);
+            EditorGUI.EndDisabledGroup();
+
             if (EditorGUI.EndChangeCheck())
             {
                 if (!Application.isPlaying)
@@ -63,9 +79,16 @@ namespace NineFive.Proc
             var preview = new Texture2D(size, size);
             preview.filterMode = FilterMode.Point;
 
-            store.tiles = new Dictionary<Vector2Int, Transform>();
+            store.tiles = new Dictionary<Vector2Int, TileData>();
 
-            floorPlan.Apply(store, new System.Random(store.StartingSeed.GetHashCode()));
+            System.Random rnd;
+
+            if (string.IsNullOrEmpty(store.StartingSeed))
+                rnd = new System.Random(System.Environment.TickCount);
+            else
+                rnd = new System.Random(store.StartingSeed.GetHashCode());
+
+            floorPlan.Apply(store, rnd);
             var tiles = floorPlan.GetTiles();
 
             for (int x = 0; x < size; x++)

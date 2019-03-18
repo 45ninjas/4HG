@@ -10,9 +10,9 @@ namespace NineFive.Proc
         public ProcLayer[] layers;
         System.Random random;
 
-        public Dictionary<Vector2Int, Transform> tiles;
+        public Dictionary<Vector2Int, TileData> tiles;
 
-        [SerializeField]
+        [HideInInspector]
         public string StartingSeed = "Hello World";
 
         [HideInInspector]
@@ -27,8 +27,7 @@ namespace NineFive.Proc
         }
         public void CreateStore()
         {
-            int seed = new System.Random().Next();
-            CreateStore(seed);
+            CreateStore(System.Environment.TickCount);
         }
 
         public void ClearStore()
@@ -49,7 +48,7 @@ namespace NineFive.Proc
             // Clear the old store.
             ClearStore();
 
-            tiles = new Dictionary<Vector2Int, Transform>();
+            tiles = new Dictionary<Vector2Int, TileData>();
 
             // Create a new random number generator with the provided seed.
             Seed = seed;
@@ -63,7 +62,10 @@ namespace NineFive.Proc
 
         private void Start()
         {
-            CreateStore(StartingSeed);
+            if (string.IsNullOrWhiteSpace(StartingSeed))
+                CreateStore();
+            else
+                CreateStore(StartingSeed);
         }
 
         private void OnDrawGizmosSelected()
@@ -83,6 +85,11 @@ namespace NineFive.Proc
 
                 Gizmos.DrawLine(new Vector3(Bounds.xMin, 0, Bounds.yMax), new Vector3(Bounds.xMax, 0, Bounds.yMin));
                 Gizmos.DrawLine(new Vector3(Bounds.xMin, 5, Bounds.yMax), new Vector3(Bounds.xMax, 5, Bounds.yMin));
+            }
+
+            foreach (ProcLayer layer in layers)
+            {
+                layer.DrawGizmos();
             }
         }
     }

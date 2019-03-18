@@ -23,9 +23,8 @@ namespace NineFive.Proc.Layers
 
             // Add blank tiles to the Store
             foreach (var tile in tiles)
-                store.tiles.Add(tile, null);
+                store.tiles.Add(tile, new TileData());
         }
-
         public Vector2Int[] GetBlocks()
         {
             Vector2Int[] square = new Vector2Int[]
@@ -82,6 +81,7 @@ namespace NineFive.Proc.Layers
 
             Vector2Int[] tiles = new Vector2Int[blocks.Length * BlockSize * BlockSize];
 
+            // Go through each block and convert it into individual tiles for the rest of the layers to use.
             int t = 0;
             foreach (var block in blocks)
             {
