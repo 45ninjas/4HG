@@ -57,12 +57,12 @@ namespace NineFive.Proc.Layers
             triangles = new List<int>();
             normals = new List<Vector3>();
 
-            Vector2Int perlinOffset = new Vector2Int(random.Next(), random.Next());
+            Vector2Int perlinOffset = new Vector2Int(random.Next(-2000, 2000), random.Next(-2000, 2000));
 
             foreach (var tile in store.tiles)
             {
                 // Randomly choose a floor type.
-                float perlin = Mathf.PerlinNoise(tile.Key.x * perlinFrequency, tile.Key.y * perlinFrequency);
+                float perlin = Mathf.PerlinNoise((tile.Key.x + perlinOffset.x) * perlinFrequency, (tile.Key.y + perlinOffset.y) * perlinFrequency);
                 if (perlin > 0.5f)
                 {
                     tile.Value.FloorType = materialA;

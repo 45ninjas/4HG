@@ -27,6 +27,9 @@
 4hr-game/*.pdb
 4hr-game/*.opendb
 
+# Misc files
+4hr-game/last-seeds.txt
+
 # Unity3D generated meta files
 4hr-game/*.pidb.meta
 4hr-game/*.pdb.meta

@@ -10,6 +10,10 @@ namespace NineFive.Proc
         public ProcLayer[] layers;
         System.Random random;
 
+#if UNITY_EDITOR
+        const int lineCount = 10;
+#endif
+
         public Dictionary<Vector2Int, TileData> tiles;
 
         [HideInInspector]
@@ -58,6 +62,37 @@ namespace NineFive.Proc
             {
                 layers[i].Apply(this, random);
             }
+
+#if UNITY_EDITOR
+
+            string[] lines = null;
+
+            try
+            {
+                lines = System.IO.File.ReadAllLines("last-seeds.txt", System.Text.Encoding.UTF8);
+            }
+            catch (System.Exception)
+            {
+
+            }
+
+
+            List<string> newLines = new List<string>();
+            newLines.Add(seed.ToString());
+
+            if (lines != null)
+            {
+                for (int i = 0; i < lineCount - 1; i++)
+                {
+                    if (i < lines.Length)
+                        newLines.Add(lines[i]);
+                }
+            }
+
+            newLines.Add(string.Format("These where the last {0} seeds to be generated. In Dec-ending order.", lineCount));
+
+            System.IO.File.WriteAllLines("last-seeds.txt", newLines);
+#endif
         }
 
         private void Start()
